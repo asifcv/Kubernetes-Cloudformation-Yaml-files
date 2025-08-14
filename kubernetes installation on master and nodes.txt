@@ -23,15 +23,16 @@ sudo sed -i '/ swap / s/^/#/' /etc/fstab
 
 5-  Install Kubernetes Tools (kubeadm, kubelet, kubectl)
 
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key \
+  | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 Add the Kubernetes repo:
-cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-deb http://apt.kubernetes.io/ kubernetes-xenial main
-EOF
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] \
+https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" \
+  | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-sudo apt update
-sudo apt install -y kubelet kubeadm kubectl
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 
 5. Initialize the Master Node
@@ -54,4 +55,5 @@ kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/
 8. Verify the Cluster
 kubectl get nodes
 kubectl get pods -A
+
 	
